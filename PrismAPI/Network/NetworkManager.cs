@@ -3,6 +3,7 @@ using Cosmos.System.Network.IPv4.UDP.DNS;
 using Cosmos.System.Network.IPv4.TCP;
 using Cosmos.System.Network.IPv4;
 using PrismAPI.Tools.Diagnostics;
+using System.Net.Sockets;
 
 namespace PrismAPI.Network;
 
