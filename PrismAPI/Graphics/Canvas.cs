@@ -53,17 +53,17 @@ public unsafe class Canvas
 	/// <param name="X">X position of the pixel.</param>
 	/// <param name="Y">Y position of the pixel.</param>
 	/// <returns>The pixel color at X and Y.</returns>
-	public Color this[int X, int Y]
+	public uint this[int X, int Y]
 	{
 		get
 		{
 			// Check if coordinates are out of bounds.
 			if (X < 0 || Y < 0 || X >= Width || Y >= Height)
 			{
-				return Color.Black;
+				return Color32.Black;
 			}
 
-			return new(Internal[(Y * Width) + X]);
+			return Internal[(Y * Width) + X];
 		}
 		set
 		{
@@ -74,12 +74,12 @@ public unsafe class Canvas
 			}
 
 			// Blend 2 colors together if the new color has alpha.
-			if (value.A < 255)
+			if (Color32.GetAlpha(value) < 255)
 			{
-				value = Color.AlphaBlend(this[X, Y], value);
+				value = Color32.AlphaBlend(this[X, Y], value);
 			}
 
-			Internal[(Y * Width) + X] = value.ARGB;
+			Internal[(Y * Width) + X] = value;
 		}
 	}
 
@@ -88,17 +88,17 @@ public unsafe class Canvas
 	/// </summary>
 	/// <param name="Index">Index position of the pixel.</param>
 	/// <returns>The pixel color at the linear index.</returns>
-	public Color this[uint Index]
+	public uint this[uint Index]
 	{
 		get
 		{
 			// Check if index is out of bounds.
 			if (Index >= Size)
 			{
-				return Color.Black;
+				return Color32.Black;
 			}
 
-			return new(Internal[Index]);
+			return Internal[Index];
 		}
 		set
 		{
@@ -109,12 +109,12 @@ public unsafe class Canvas
 			}
 
 			// Blend 2 colors together if the new color has alpha.
-			if (value.A < 255)
+			if (Color32.GetAlpha(value) < 255)
 			{
-				value = Color.AlphaBlend(this[Index], value);
+				value = Color32.AlphaBlend(this[Index], value);
 			}
 
-			Internal[Index] = value.ARGB;
+			Internal[Index] = value;
 		}
 	}
 
@@ -128,6 +128,7 @@ public unsafe class Canvas
 		{
 			// Set new value.
 			_Height = value;
+			Size = (uint)(_Height * _Width);
 
 			// Check if no allocations are needed.
 			if (_Width == 0)
@@ -162,6 +163,7 @@ public unsafe class Canvas
 		{
 			// Set new value.
 			_Width = value;
+			Size = (uint)(_Height * _Width);
 
 			// Check if no allocations are needed.
 			if (_Height == 0)
@@ -185,11 +187,6 @@ public unsafe class Canvas
 			GCImplementation.IncRootCount((ushort*)Internal);
 		}
 	}
-
-	/// <summary>
-	/// The total area of the canvas in pixels.
-	/// </summary>
-	public uint Size => (uint)(_Width * _Height);
 
 	#endregion
 
@@ -220,10 +217,12 @@ public unsafe class Canvas
 			int SX = (int)(X + (I % Width));
 			int SY = (int)(Y + (I / Width));
 
-			A[I] = (int)this[SX, SY].A;
-			R[I] = (int)this[SX, SY].R;
-			G[I] = (int)this[SX, SY].G;
-			B[I] = (int)this[SX, SY].B;
+			byte[] SplitColors = Color32.SplitChannels(this[SX, SY]);
+
+			A[I] = SplitColors[0];
+			R[I] = SplitColors[1];
+			G[I] = SplitColors[2];
+			B[I] = SplitColors[3];
 		}
 
 		var newAlpha = new int[Size];
@@ -247,7 +246,7 @@ public unsafe class Canvas
 			int SX = (int)(X + (I % Width));
 			int SY = (int)(Y + (I / Width));
 
-			this[SX, SY] = new(newAlpha[I], newRed[I], newGreen[I], newBlue[I]);
+			this[SX, SY] = Color32.FromARGB(newAlpha[I], newRed[I], newGreen[I], newBlue[I]);
 		}
 	}
 
@@ -260,7 +259,7 @@ public unsafe class Canvas
 	/// <param name="Height">Height of the rectangle.</param>
 	/// <param name="Radius">The border radius of the rectangle.</param>
 	/// <param name="Color">The <see cref="Color"/> object to draw with.</param>
-	public void DrawFilledRectangle(int X, int Y, ushort Width, ushort Height, ushort Radius, Color Color)
+	public void DrawFilledRectangle(int X, int Y, ushort Width, ushort Height, ushort Radius, uint Color)
 	{
 		// Quit if nothing needs to be drawn.
 		if (X >= this.Width || Y >= this.Height)
@@ -273,7 +272,7 @@ public unsafe class Canvas
 		}
 
 		// Fastest cropped draw method.
-		if (Color.A == 255 && Radius == 0)
+		if (Color32.GetAlpha(Color) == 255 && Radius == 0)
 		{
 			// Fastest copy-only draw method, fills the whole buffer.
 			if (X == 0 && Y == 0 && Width == this.Width && Height == this.Height)
@@ -298,7 +297,7 @@ public unsafe class Canvas
 			// Fill the region with the color
 			for (uint IY = 0; IY < RHeight; IY++)
 			{
-				MemoryOperations.Fill(Internal + Destination + (IY * this.Width), Color.ARGB, (int)RWidth);
+				MemoryOperations.Fill(Internal + Destination + (IY * this.Width), Color, (int)RWidth);
 			}
 			return;
 		}
@@ -353,7 +352,7 @@ public unsafe class Canvas
 	/// <param name="Height">Height of the rectangle.</param>
 	/// <param name="Radius">The border radius of the rectangle.</param>
 	/// <param name="Color">The <see cref="Color"/> object to draw with.</param>
-	public void DrawRectangle(int X, int Y, ushort Width, ushort Height, ushort Radius, Color Color)
+	public void DrawRectangle(int X, int Y, ushort Width, ushort Height, ushort Radius, uint Color)
 	{
 		// Draw circles to add curvature if needed.
 		if (Radius > 0)
@@ -380,7 +379,7 @@ public unsafe class Canvas
 	/// <param name="BlockSize">Scale of all blocks.</param>
 	/// <param name="BlockType1">Color of block type 1.</param>
 	/// <param name="BlockType2">Color of block type 2.</param>
-	public void DrawRectangleGrid(int X, int Y, ushort BlockCountX, ushort BlockCountY, ushort BlockSize, Color BlockType1, Color BlockType2)
+	public void DrawRectangleGrid(int X, int Y, ushort BlockCountX, ushort BlockCountY, ushort BlockSize, uint BlockType1, uint BlockType2)
 	{
 		for (int IX = 0; IX < BlockCountX; IX++)
 		{
@@ -510,7 +509,7 @@ public unsafe class Canvas
 	/// <param name="Y">Center Y of the circle.</param>
 	/// <param name="Radius">Radius of the circle.</param>
 	/// <param name="Color">The <see cref="Color"/> object to draw with.</param>
-	public void DrawFilledCircle(int X, int Y, ushort Radius, Color Color)
+	public void DrawFilledCircle(int X, int Y, ushort Radius, uint Color)
 	{
 		// Quit if there is nothing to draw.
 		if (Radius == 0)
@@ -519,7 +518,7 @@ public unsafe class Canvas
 		}
 
 		// Check if the circle can be drawn fast.
-		if (Color.A == 255)
+		if (Color32.GetAlpha(Color) == 255)
 		{
 			ushort R2 = (ushort)(Radius * Radius);
 
@@ -543,7 +542,7 @@ public unsafe class Canvas
 				}
 
 				// Fill one line of pixels.
-				MemoryOperations.Fill(Offset, Color.ARGB, IX * 2);
+				MemoryOperations.Fill(Offset, Color, IX * 2);
 			}
 
 			// Be sure to return.
@@ -569,7 +568,7 @@ public unsafe class Canvas
 	/// <param name="Y">Center Y of the circle.</param>
 	/// <param name="Radius">Radius of the circle.</param>
 	/// <param name="Color">The <see cref="Color"/> object to draw with.</param>
-	public void DrawCircle(int X, int Y, ushort Radius, Color Color)
+	public void DrawCircle(int X, int Y, ushort Radius, uint Color)
 	{
 		int IX = 0, IY = Radius, DP = 3 - (2 * Radius);
 
@@ -613,7 +612,7 @@ public unsafe class Canvas
 	/// <param name="Y3">Y position 2.</param>
 	/// <param name="Color">The <see cref="Color"/> object to draw with.</param>
 	/// <param name="N">Used inside the method only.</param>
-	public void DrawQuadraticBezierLine(int X1, int Y1, int X2, int Y2, int X3, int Y3, Color Color, byte N = 6)
+	public void DrawQuadraticBezierLine(int X1, int Y1, int X2, int Y2, int X3, int Y3, uint Color, byte N = 6)
 	{
 		// X2 and Y2 is where the curve should bend to.
 		if (N > 0)
@@ -647,7 +646,7 @@ public unsafe class Canvas
 	/// <param name="X4">X position 2.</param>
 	/// <param name="Y4">Y position 2.</param>
 	/// <param name="Color">The <see cref="Color"/> object to draw with.</param>
-	public void DrawCubicBezierLine(int X1, int Y1, int X2, int Y2, int X3, int Y3, int X4, int Y4, Color Color)
+	public void DrawCubicBezierLine(int X1, int Y1, int X2, int Y2, int X3, int Y3, int X4, int Y4, uint Color)
 	{
 		for (double U = 0.0; U <= 1.0; U += 0.0001)
 		{
@@ -671,7 +670,7 @@ public unsafe class Canvas
 	/// <param name="Angle">Angle in degrees.</param>
 	/// <param name="Radius">Radius or Length.</param>
 	/// <param name="Color">The <see cref="Color"/> object to draw with.</param>
-	public void DrawAngledLine(int X, int Y, short Angle, ushort Radius, Color Color)
+	public void DrawAngledLine(int X, int Y, short Angle, ushort Radius, uint Color)
 	{
 		int IX = (int)(Radius * Math.Cos(Math.PI * Angle / 180));
 		int IY = (int)(Radius * Math.Sin(Math.PI * Angle / 180));
@@ -687,7 +686,7 @@ public unsafe class Canvas
 	/// <param name="X2">X positoin 2.</param>
 	/// <param name="Y2">Y position 2.</param>
 	/// <param name="Color">The <see cref="Color"/> object to draw with.</param>
-	public void DrawLine(int X1, int Y1, int X2, int Y2, Color Color)
+	public void DrawLine(int X1, int Y1, int X2, int Y2, uint Color)
 	{
 		int DX = Math.Abs(X2 - X1), SX = X1 < X2 ? 1 : -1;
 		int DY = Math.Abs(Y2 - Y1), SY = Y1 < Y2 ? 1 : -1;
@@ -718,7 +717,7 @@ public unsafe class Canvas
 	/// <param name="Color">The <see cref="Color"/> object to draw with.</param>
 	/// <param name="StartAngle">Angle at which to start.</param>
 	/// <param name="EndAngle">Angle at which to end.</param>
-	public void DrawArc(int X, int Y, ushort Width, ushort Height, Color Color, int StartAngle = 0, int EndAngle = 360)
+	public void DrawArc(int X, int Y, ushort Width, ushort Height, uint Color, int StartAngle = 0, int EndAngle = 360)
 	{
 		// Quit if nothing needs to be drawn.
 		if (Width == 0 || Height == 0)
@@ -746,7 +745,7 @@ public unsafe class Canvas
 	/// <param name="Color">The <see cref="Color"/> object to draw with.</param>
 	/// <param name="StartAngle">Angle at which to start.</param>
 	/// <param name="EndAngle">Angle at which to end.</param>
-	public void DrawArc(int X, int Y, ushort Radius, Color Color, int StartAngle = 0, int EndAngle = 360)
+	public void DrawArc(int X, int Y, ushort Radius, uint Color, int StartAngle = 0, int EndAngle = 360)
 	{
 		// Quit if nothing needs to be drawn.
 		if (Radius == 0)
@@ -842,7 +841,7 @@ public unsafe class Canvas
 	/// <param name="Font">Font to use.</param>
 	/// <param name="Color">The <see cref="Color"/> object to draw with.</param>
 	/// <param name="Center">Option to cented the text at X and Y.</param>
-	public void DrawString(int X, int Y, string Text, Font? Font, Color Color, bool Center = false)
+	public void DrawString(int X, int Y, string Text, Font? Font, uint Color, bool Center = false)
 	{
 		// Basic null check.
 		if (string.IsNullOrEmpty(Text))
@@ -918,9 +917,9 @@ public unsafe class Canvas
 	/// Clears the canvas with the specified color.
 	/// </summary>
 	/// <param name="Color">Color to clear the canvas with.</param>
-	public void Clear(Color Color)
+	public void Clear(uint Color)
 	{
-		MemoryOperations.Fill(Internal, Color.ARGB, (int)Size);
+		MemoryOperations.Fill(Internal, Color, (int)Size);
 	}
 
 	/// <summary>
@@ -928,7 +927,7 @@ public unsafe class Canvas
 	/// </summary>
 	public void Clear()
 	{
-		Clear(Color.Black);
+		Clear(Color32.Black);
 	}
 
 	/// <summary>
@@ -980,6 +979,11 @@ public unsafe class Canvas
 	/// The graphics frame buffer, with a size matching <see cref="Size"/>.
 	/// </summary>
 	internal uint* Internal;
+
+	/// <summary>
+	/// This represents the size of the canvas. It should not be changed directly.
+	/// </summary>
+	internal uint Size;
 
 	#endregion
 }

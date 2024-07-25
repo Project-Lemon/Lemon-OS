@@ -21,7 +21,7 @@
 		<CosmosDebugPort>Serial: COM1</CosmosDebugPort>
 		<QemuNetworkDevice>PCNet</QemuNetworkDevice>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<VBEResolution>640x400x32</VBEResolution>
+		<VBEResolution>1024x640x32</VBEResolution>
 		<VMWareEdition>Workstation</VMWareEdition>
 		<OptimizationLevel>2</OptimizationLevel>
 		<QemuAudioDriver>AC97</QemuAudioDriver>

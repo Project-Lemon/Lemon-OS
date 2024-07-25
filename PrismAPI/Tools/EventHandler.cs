@@ -23,7 +23,7 @@
 		{
 			Events = new();
 
-			Timer T = new((_) => HandleAllEvents(), null, 150, 0);
+			Timer T = new((_) => HandleAllEvents(), null, 0, 150);
 		}
 
 		#region Methods

@@ -36,10 +36,11 @@ public class HTTPClient
             $"GET {URL.Path} HTTP/1.1\n" +
             "Connection: Keep - Alive";
 
-        TcpClient Client = new(URL.Address, Port);
-        Client.Connect(URL.Address, Port);
-        Client.Send(Encoding.UTF8.GetBytes(Request));
-        return Client.Receive(ref EP);
+        //TcpClient Client = new(URL.Address, Port);
+        //Client.Connect(URL.Address, Port);
+        //Client.Send(Encoding.UTF8.GetBytes(Request));
+        //return Client.Receive(ref EP);
+        return Array.Empty<byte>();
     }
 
     #endregion

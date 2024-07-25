@@ -14,11 +14,11 @@ public class Gradient : Canvas
 	/// <param name="Start">The starting color.</param>
 	/// <param name="End">The end color.</param>
 	/// <returns>A new instance of a graphics object.</returns>
-	public Gradient(ushort Width, ushort Height, Color Start, Color End) : base(Width, Height)
+	public Gradient(ushort Width, ushort Height, uint Start, uint End) : base(Width, Height)
 	{
 		for (int I = 0; I < Height; I++)
 		{
-			DrawFilledRectangle(0, I, Width, 1, 0, Color.Lerp(Start, End, 1.0f / Height * I));
+			DrawFilledRectangle(0, I, Width, 1, 0, Color32.Lerp(Start, End, 1.0f / Height * I));
 		}
 	}
 
@@ -29,7 +29,7 @@ public class Gradient : Canvas
 	/// <param name="Height">Height (in pixels) of the gradient.</param>
 	/// <param name="Colors">The colors to generate in the canvas.</param>
 	/// <returns>A new instance of a graphics object.</returns>
-	public Gradient(ushort Width, ushort Height, Color[] Colors) : base(Width, Height)
+	public Gradient(ushort Width, ushort Height, uint[] Colors) : base(Width, Height)
 	{
 		// Calculate the height 'delta', it is the total width per gradient pair.
 		int HeightDelta = Height / (Colors.Length - 1);
@@ -41,7 +41,7 @@ public class Gradient : Canvas
 			for (int I2 = 0; I2 < HeightDelta; I2++)
 			{
 				// Get the interpolated color. It's calculated based on 'I1' and delta height index 'I2'.
-				Color Calculated = Color.Lerp(Colors[I1], Colors[I1 + 1], 1.0f / HeightDelta * I2);
+				uint Calculated = Color32.Lerp(Colors[I1], Colors[I1 + 1], 1.0f / HeightDelta * I2);
 
 				// Fill this line with the correct color across with 1 pixel height.
 				DrawFilledRectangle(0, (HeightDelta * I1) + I2, Width, 1, 0, Calculated);
@@ -73,7 +73,7 @@ public class Gradient : Canvas
 				float B = 0.5f + (0.5f * MathF.Cos(ElapsedMS + UVY + 4));
 
 				// Output to screen
-				this[X, Y] = new(255, R * 255, G * 255, B * 255);
+				this[X, Y] = Color32.FromARGB(255, R * 255, G * 255, B * 255);
 			}
 		}
 	}

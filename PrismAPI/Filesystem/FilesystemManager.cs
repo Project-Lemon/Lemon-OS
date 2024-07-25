@@ -51,7 +51,7 @@ public static class FilesystemManager
 
 		// Create MBR and Primary partitions.
 		SelectedDisk.CreatePartition(512);
-		SelectedDisk.CreatePartition((SelectedDisk.Size - 512) / 1048576);
+		SelectedDisk.CreatePartition((int)((SelectedDisk.Size - 512) / 1048576));
 
 		// Create MBR helper instance and write info to the disk.
 		MBR Helper = new(SelectedDisk.Host);

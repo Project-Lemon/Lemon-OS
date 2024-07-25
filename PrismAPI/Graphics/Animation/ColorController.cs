@@ -15,7 +15,7 @@ public class ColorController : AnimationController
 	/// <param name="Target">The value to end at.</param>
 	/// <param name="Duration">The duration to play the animation over.</param>
 	/// <param name="Mode">The ease animation mode.</param>
-	public ColorController(Color Source, Color Target, TimeSpan Duration, AnimationMode Mode) : base(0f, 1f, Duration, Mode)
+	public ColorController(uint Source, uint Target, TimeSpan Duration, AnimationMode Mode) : base(0f, 1f, Duration, Mode)
 	{
 		// Set-up all controllers for each color channel.
 		this.Source = Source;
@@ -29,7 +29,7 @@ public class ColorController : AnimationController
 	/// <summary>
 	/// The current color defined by the animation.
 	/// </summary>
-	public new Color Current => Color.Lerp(Source, Target, base.Current);
+	public new uint Current => Color32.Lerp(Source, Target, base.Current);
 
 	#endregion
 
@@ -38,12 +38,12 @@ public class ColorController : AnimationController
 	/// <summary>
 	/// The source color of the animation.
 	/// </summary>
-	public new Color Source;
+	public new uint Source;
 
 	/// <summary>
 	/// The target color of the animation.
 	/// </summary>
-	public new Color Target;
+	public new uint Target;
 
 	#endregion
 }

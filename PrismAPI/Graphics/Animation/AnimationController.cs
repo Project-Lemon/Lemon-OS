@@ -24,7 +24,7 @@ public class AnimationController
 		this.Mode = Mode;
 
 		// Assign the timer.
-		Timer = new((_) => Next(), null, DelayMS, 0);
+		Timer = new((_) => Next(), null, 0, DelayMS);
 	}
 
 	#endregion

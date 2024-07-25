@@ -1,15 +1,12 @@
 ﻿using PrismAPI.Runtime.SystemCall;
 using PrismAPI.Tools.Extentions;
 using PrismAPI.Hardware.GPU;
-using PrismAPI.UI.Controls;
 using PrismAPI.Filesystem;
 using Cosmos.Core.Memory;
-using PrismAPI.UI.Config;
 using PrismAPI.Graphics;
 using PrismAPI.Network;
 using PrismAPI.Audio;
 using Cosmos.System;
-using PrismAPI.UI;
 using Cosmos.Core;
 
 namespace PrismOS;
@@ -33,24 +30,9 @@ public class Program : Kernel
 
 		Boot.Show(Canvas);
 
-		// Initialize the FPS widget and task bar.
-		FPSWidget = new(15, 15, "Initializing...");
-		Taskbar = new(0, Canvas.Height - 48, Canvas.Width, 48);
-
 		// Scale the boot slash and wallpaper images.
 		Media.Prism = Filters.Scale((ushort)(Canvas.Height / 3), (ushort)(Canvas.Height / 3), Media.Prism);
 		Media.Wallpaper = Filters.Scale(Canvas.Width, Canvas.Height, Media.Wallpaper);
-
-		TestWindow = new(100, 100, 250, 150, "Window1")
-		{
-			Controls =
-			{
-				new Button(50, 50, 128, 64, 4, "Button1", ThemeStyle.Holo),
-			},
-		};
-		WindowManager.Windows.Add(TestWindow);
-		WindowManager.Widgets.Add(FPSWidget);
-		WindowManager.Widgets.Add(Taskbar);
 
 		// Initialize system services.
 		FilesystemManager.Init();
@@ -61,7 +43,7 @@ public class Program : Kernel
 		// Disable the screen timer.
 		Boot.Hide();
 
-		AudioPlayer.Play(Media.Startup);
+		//AudioPlayer.Play(Media.Startup);
 	}
 
 	/// <summary>
@@ -71,27 +53,27 @@ public class Program : Kernel
 	{
 		// Draw the wallpaper.
 		Canvas.DrawImage(0, 0, Media.Wallpaper, false);
-		FPSWidget.Contents = $"{Canvas.GetFPS()} FPS\n{Canvas.GetName()}\n{StringEx.GetMegaBytes(GCImplementation.GetUsedRAM())} MB";
 
 		// Example of a drawable widget.
-		Taskbar.Clear(Color.DeepGray);
-		Taskbar.DrawString(0, 28, $"{WindowManager.Windows.Count} window{((WindowManager.Windows.Count == 1) ? " is open." : "s are open.")}", default, Color.White);
+		Canvas.DrawString(128, 16, $"{Canvas.GetFPS()} FPS", default, Color32.White);
 
 		// Draw the mouse on screen, then update.
-		WindowManager.Update(Canvas);
 		Canvas.DrawImage((int)MouseManager.X, (int)MouseManager.Y, Media.Cursor);
 		Canvas.Update();
-		//Heap.Collect();
+
+		// Clean memory every 30 frames.
+		if (FrameCount++ >= 30)
+		{
+			Heap.Collect();
+		}
 	}
 
 	#endregion
 
 	#region Fields
 
-	public Window TestWindow = null!;
 	public static Display Canvas = null!;
-	public Drawable Taskbar = null!;
-	public Label FPSWidget = null!;
+	private static int FrameCount = 0;
 
 	#endregion
 }

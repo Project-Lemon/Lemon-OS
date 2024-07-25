@@ -13,7 +13,7 @@ public static class Boot
 		// Initialize the animations.
 		A = new(25f, 270f, new(0, 0, 0, 0, 750), AnimationMode.Ease);
 		B = new(0f, 360f, new(0, 0, 0, 0, 500), AnimationMode.Linear);
-		C = new(Color.Transparent, Color.Black, new(0, 0, 0, 0, 500), AnimationMode.Ease);
+		C = new(Color32.Transparent, Color32.Black, new(0, 0, 0, 0, 500), AnimationMode.Ease);
 		A.IsContinuous = true;
 	}
 
@@ -38,9 +38,9 @@ public static class Boot
 		int LengthOffset = (int)(B.Current + A.Current);
 		int Offset = (int)B.Current;
 
-		Canvas.DrawArc(W2, H2 + (H2 / 2) + (H3 / 2), 19, Color.LightGray, Offset, LengthOffset);
-		Canvas.DrawArc(W2, H2 + (H2 / 2) + (H3 / 2), 20, Color.White, Offset, LengthOffset);
-		Canvas.DrawArc(W2, H2 + (H2 / 2) + (H3 / 2), 21, Color.LightGray, Offset, LengthOffset);
+		Canvas.DrawArc(W2, H2 + (H2 / 2) + (H3 / 2), 19, Color32.LightGray, Offset, LengthOffset);
+		Canvas.DrawArc(W2, H2 + (H2 / 2) + (H3 / 2), 20, Color32.White, Offset, LengthOffset);
+		Canvas.DrawArc(W2, H2 + (H2 / 2) + (H3 / 2), 21, Color32.LightGray, Offset, LengthOffset);
 		Canvas.Update();
 	}
 
@@ -56,8 +56,8 @@ public static class Boot
 		Boot.Canvas = Canvas;
 
 		// Add a timer to update the screen while booting.
-		Timer T = new((_) => { if (IsEnabled) { Update(); }}, null, 55, 0);
 		IsEnabled = true;
+		Timer T = new((_) => { if (IsEnabled) { Update(); }}, null, 40, 0);
 		IsSetup = true;
 	}
 

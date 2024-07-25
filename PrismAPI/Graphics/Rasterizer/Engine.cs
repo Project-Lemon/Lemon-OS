@@ -26,7 +26,7 @@ public class Engine : Canvas
 		this.Height = Height;
 		this.Width = Width;
 
-		SkyColor = Color.GoogleBlue;
+		SkyColor = Color32.GoogleBlue;
 		Lights = new();
 		Objects = new();
 		Camera = new(FOV);
@@ -50,7 +50,7 @@ public class Engine : Canvas
 		float Translator = (float)(Width / 2 / Math.Tan((Camera.FOV + Zoom) / 2 * 0.0174532925)); // 0.0174532925 == pi / 180
 
 		// Set the sky color - Make sure to adjust for ambiant color aswell.
-		Clear(Color.Normalize(SkyColor) * Camera.Ambient);
+		Clear(Color32.Multiply(Color32.Normalize(SkyColor), Camera.Ambient));
 
 		// Calculate Objects - Loops over all triangle in every mesh.
 		foreach (Mesh M in Objects)
@@ -76,8 +76,8 @@ public class Engine : Canvas
 					Temp = Triangle.Center(Temp, Width, Height);
 
 					// Normalize lighting & apply ambiance.
-					Temp.Color = Color.Normalize(Temp.Color);
-					Temp.Color *= Camera.Ambient;
+					Temp.Color = Color32.Normalize(Temp.Color);
+					Temp.Color = Color32.Multiply(Temp.Color, Camera.Ambient);
 
 					// Rasterize the triangle.
 					DrawFilledTriangle(Temp);
@@ -92,7 +92,7 @@ public class Engine : Canvas
 
 	public List<Light> Lights;
 	public List<Mesh> Objects;
-	public Color SkyColor;
+	public uint SkyColor;
 	public Camera Camera;
 	public float Zoom;
 

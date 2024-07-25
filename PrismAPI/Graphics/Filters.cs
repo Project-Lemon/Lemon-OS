@@ -95,7 +95,7 @@ public static unsafe class Filters
 		for (uint I = 0; I < ToMask.Size; I++)
 		{
 			// Skip if pixel is alpha.
-			if (ToMask[I].A < 255)
+			if (Color32.GetAlpha(ToMask[I]) < 255)
 			{
 				continue;
 			}
@@ -199,7 +199,7 @@ public static unsafe class Filters
 		// Loop over & blend all pixels together.
 		for (uint I = 0; I < Result.Size; I++)
 		{
-			Result.Internal[I] = ((High[I] + Normal[I] + Low[I]) / 3).ARGB;
+			Result.Internal[I] = Color32.Divide((Color32.Add(Color32.Add(High[I], Normal[I]), Low[I])), 3);
 		}
 
 		// Resurn HDR blend result.
@@ -226,15 +226,15 @@ public static unsafe class Filters
 				continue;
 			}
 
-			Color Average = G[I] / 3; // Center point.
+			uint Average = Color32.Divide(G[I], 3); // Center point.
 
-			Average += G[I - G.Width] / 6; // Top.
-			Average += G[I + G.Width] / 6; // Bottom.
-			Average += G[I - 1] / 6; // Right.
-			Average += G[I + 1] / 6; // Left.
+			Average = Color32.Add(Average, Color32.Divide(G[I - G.Width], 6)); // Top.
+			Average = Color32.Add(Average, Color32.Divide(G[I + G.Width], 6)); // Top.
+			Average = Color32.Add(Average, Color32.Divide(G[I - 1], 6)); // Right.
+			Average = Color32.Add(Average, Color32.Divide(G[I + 1], 6)); // Left.
 
 			// Draw the average on to the buffer.
-			Result.Internal[I] = Average.ARGB;
+			Result.Internal[I] = Average;
 		}
 
 		// Return filtered image.
@@ -254,7 +254,7 @@ public static unsafe class Filters
 		// Loop over all pixel linearly.
 		for (uint I = 0; I < G.Size; I++)
 		{
-			Result.Internal[I] = Color.Invert(G[I]).ARGB;
+			Result.Internal[I] = Color32.Invert(G[I]);
 		}
 
 		// Return the result of the operation.

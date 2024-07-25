@@ -19,7 +19,7 @@ public class Camera
 		Sensitivity = .75f;
 		Position = new();
 		Rotation = new();
-		Ambient = Color.White;
+		Ambient = Color32.White;
 		this.FOV = FOV;
 	}
 
@@ -62,7 +62,7 @@ public class Camera
 	public float Sensitivity;
 	public Vector3 Position;
 	public Vector3 Rotation;
-	public Color Ambient;
+	public uint Ambient;
 	public float FOV;
 
 	#endregion

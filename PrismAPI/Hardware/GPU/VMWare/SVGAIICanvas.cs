@@ -223,7 +223,7 @@ public unsafe class SVGAIICanvas : Display
 
 		for (uint I = 0; I < Cursor.Size; I++)
 		{
-			WriteToFifo(Cursor[I].ARGB);
+			WriteToFifo(Cursor[I]);
 		}
 
 		WaitForFifo();

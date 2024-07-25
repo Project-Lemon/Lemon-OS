@@ -266,7 +266,7 @@ public unsafe static class Image
                         for (int x = 0; x < Result.Width; x++)
                         {
                             // Read ARGB color
-                            Result[x, y] = new(line.ReadUInt32());
+                            Result[x, y] = line.ReadUInt32();
                         }
                     }
 
@@ -310,13 +310,13 @@ public unsafe static class Image
             case (char)32:
                 for (uint I = 0; I < Result.Width * Result.Height * 4; I++)
                 {
-                    Result[I] = new(Binary[I + 22], Binary[I + 21], Binary[I + 20], Binary[I + 19]);
+                    Result[I] = Color32.FromARGB(Binary[I + 22], Binary[I + 21], Binary[I + 20], Binary[I + 19]);
                 }
                 break;
             case (char)24:
                 for (uint I = 0; I < Result.Width * Result.Height * 3; I++)
                 {
-                    Result[I] = new(255, Binary[I + 21], Binary[I + 20], Binary[I + 19]);
+                    Result[I] = Color32.FromARGB(255, Binary[I + 21], Binary[I + 20], Binary[I + 19]);
                 }
                 break;
         }
@@ -370,7 +370,7 @@ public unsafe static class Image
         {
             for (int X = 0; X < Result.Width; X++)
             {
-                Result[X, Y] = new(Reader.ReadByte(), Reader.ReadByte(), Reader.ReadByte());
+                Result[X, Y] = Color32.FromARGB(255, Reader.ReadByte(), Reader.ReadByte(), Reader.ReadByte());
             }
         }
 

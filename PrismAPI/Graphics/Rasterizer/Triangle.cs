@@ -6,7 +6,7 @@ public class Triangle
 {
 	#region Constructors
 
-	public Triangle(float X1, float Y1, float Z1, float X2, float Y2, float Z2, float X3, float Y3, float Z3, Color Color)
+	public Triangle(float X1, float Y1, float Z1, float X2, float Y2, float Z2, float X3, float Y3, float Z3, uint Color)
 	{
 		// Assign current points.
 		P1 = new(X1, Y1, Z1);
@@ -24,7 +24,7 @@ public class Triangle
 		L2 = Vector3.Zero;
 		L3 = Vector3.Zero;
 	}
-	public Triangle(Vector3 P1, Vector3 P2, Vector3 P3, Color Color)
+	public Triangle(Vector3 P1, Vector3 P2, Vector3 P3, uint Color)
 	{
 		// Assign current points.
 		this.P1 = P1;
@@ -44,7 +44,7 @@ public class Triangle
 	}
 	public Triangle()
 	{
-		Color = Color.Black;
+		Color = Color32.Black;
 		P1 = Vector3.Zero;
 		P2 = Vector3.Zero;
 		P3 = Vector3.Zero;
@@ -268,7 +268,7 @@ public class Triangle
 	/// <summary>
 	/// The Color of the triangle.
 	/// </summary>
-	public Color Color;
+	public uint Color;
 
 	#endregion
 }
