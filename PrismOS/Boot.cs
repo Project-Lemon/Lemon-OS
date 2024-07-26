@@ -38,9 +38,9 @@ public static class Boot
 		int LengthOffset = (int)(B.Current + A.Current);
 		int Offset = (int)B.Current;
 
-		Canvas.DrawArc(W2, H2 + (H2 / 2) + (H3 / 2), 19, Color32.LightGray, Offset, LengthOffset);
+		//Canvas.DrawArc(W2, H2 + (H2 / 2) + (H3 / 2), 19, Color32.LightGray, Offset, LengthOffset);
 		Canvas.DrawArc(W2, H2 + (H2 / 2) + (H3 / 2), 20, Color32.White, Offset, LengthOffset);
-		Canvas.DrawArc(W2, H2 + (H2 / 2) + (H3 / 2), 21, Color32.LightGray, Offset, LengthOffset);
+		//Canvas.DrawArc(W2, H2 + (H2 / 2) + (H3 / 2), 21, Color32.LightGray, Offset, LengthOffset);
 		Canvas.Update();
 	}
 
@@ -48,7 +48,7 @@ public static class Boot
 	{
 		if (IsSetup)
 		{
-			IsEnabled = true;
+			IsEnabled = false;
 			return;
 		}
 
@@ -57,8 +57,8 @@ public static class Boot
 
 		// Add a timer to update the screen while booting.
 		IsEnabled = true;
-		Timer T = new((_) => { if (IsEnabled) { Update(); }}, null, 40, 0);
 		IsSetup = true;
+		Timer T = new((_) => { if (IsEnabled) { Update(); }}, null, 40, 0);
 	}
 
 	public static void Hide()

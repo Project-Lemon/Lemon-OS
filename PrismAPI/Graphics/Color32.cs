@@ -1,10 +1,9 @@
-﻿using System.Drawing;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace PrismAPI.Graphics;
 
 /// <summary>
-/// Color class, used for drawing.
+/// 32-bit 4-channel Color class, used for drawing.
 /// </summary>
 public static class Color32
 {
@@ -37,6 +36,34 @@ public static class Color32
 			(int)SplitNew[3] + (int)(SplitSource[3] * SplitNew[0]) >> 8);
 	}
 
+	/// <summary>
+	/// Converts a 16-bit color into a 32-bit color.
+	/// <params name="Color">Any 16-bit color to convert</params>
+	/// <returns>The input color, converted into 32-bit.</returns>
+	public static uint From16Bit(ushort Color)
+	{
+		int R = (Color & 0xF800) >> 11;
+		int G = (Color & 0x07E0) >> 5;
+		int B = Color & 0x001F;
+
+		R *= 255 / 31;
+		G *= 255 / 63;
+		B *= 255 / 31;
+
+		return FromARGB(255, R, G, B);
+	}
+
+	/// <summary>
+	/// Returns a color based on the input string.
+	/// Supported features:
+	/// rgb(r,g,b)
+	/// rgb(a,r,g,b)
+	/// cymk(c, y, m, k)
+	/// argb(color)
+	/// hex input
+	/// Any web color name
+	/// <params name="ColorInfo">Any color name from the listed features.</params>
+	/// <returns>An apropriate color for the input.</returns>
 	public static uint FromName(string ColorInfo)
 	{
 		// Check if input is invalid.
@@ -374,37 +401,25 @@ public static class Color32
 	/// This function returns one of the individual color channels of a color.
 	/// <param name="Color">The color to extract</param>
 	/// </summary>
-	public static byte GetAlpha(uint Color)
-	{
-		return (byte)((Color >> 24) & 255);
-	}
+	public static byte GetAlpha(uint Color) => (byte)((Color >> 24) & 255);
 
 	/// <summary>
 	/// This function returns one of the individual color channels of a color.
 	/// <param name="Color">The color to extract</param>
 	/// </summary>
-	public static byte GetRed(uint Color)
-	{
-		return (byte)((Color >> 16) & 255);
-	}
+	public static byte GetRed(uint Color) => (byte)((Color >> 16) & 255);
 
 	/// <summary>
 	/// This function returns one of the individual color channels of a color.
 	/// <param name="Color">The color to extract</param>
 	/// </summary>
-	public static byte GetGreen(uint Color)
-	{
-		return (byte)((Color >> 8) & 255);
-	}
+	public static byte GetGreen(uint Color) => (byte)((Color >> 8) & 255);
 
 	/// <summary>
 	/// This function returns one of the individual color channels of a color.
 	/// <param name="Color">The color to extract</param>
 	/// </summary>
-	public static byte GetBlue(uint Color)
-	{
-		return (byte)(Color & 255);
-	}
+	public static byte GetBlue(uint Color) => (byte)(Color & 255);
 
 	/// <summary>
 	/// This function splits a color value into it's indiviual color components (A, R, G, B)
@@ -425,7 +440,6 @@ public static class Color32
 	/// <returns>A normalized color.</returns>
 	public static uint Normalize(uint ToNormalize)
 	{
-		// Don't use operators as to preserve the alpha value.
 		return Divide(ToNormalize, 255);
 	}
 

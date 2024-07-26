@@ -15,6 +15,7 @@ namespace PrismOS;
 // TO-DO: raycaster engine.
 // TO-DO: Fix gradient's MaskAlpha method. (?)
 // TO-DO: Move 3D engine to be shader based for all transformations.
+// TO-DO: Convert canvas to a static class and reference simple objects instead.
 */
 public class Program : Kernel
 {
@@ -26,12 +27,11 @@ public class Program : Kernel
 	protected override void BeforeRun()
 	{
 		// Initialize the display output.
-		Canvas = Display.GetDisplay(640, 400);
-
-		Boot.Show(Canvas);
+		Canvas = Display.GetDisplay(1280, 640);
 
 		// Scale the boot slash and wallpaper images.
 		Media.Prism = Filters.Scale((ushort)(Canvas.Height / 3), (ushort)(Canvas.Height / 3), Media.Prism);
+		Boot.Show(Canvas);
 		Media.Wallpaper = Filters.Scale(Canvas.Width, Canvas.Height, Media.Wallpaper);
 
 		// Initialize system services.
@@ -43,7 +43,7 @@ public class Program : Kernel
 		// Disable the screen timer.
 		Boot.Hide();
 
-		//AudioPlayer.Play(Media.Startup);
+		AudioPlayer.Play(Media.Startup);
 	}
 
 	/// <summary>
